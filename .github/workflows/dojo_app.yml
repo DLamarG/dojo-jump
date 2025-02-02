@@ -1,21 +1,42 @@
-name: CI
+name: Test and Deploy
 
 on:
   push:
     branches:
+      - main
       - master
   pull_request:
     branches:
+      - main
       - master
 
 jobs:
-  build:
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Add any additional steps here, such as running a linter or deploying the app
-      - name: List files (for debugging)
-        run: ls -la
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found, skipping install."
+          fi
+
+      - name: Run tests
+        run: |
+          if [ -f package.json ]; then
+            npm test
+          else
+            echo "No tests found, skipping."
+          fi
+
